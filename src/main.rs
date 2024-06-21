@@ -45,7 +45,14 @@ fn main() {
         stdin.read_line(&mut input).unwrap();
 
         let trimmed_input = input.trim();
-        let command = Command::from_str(trimmed_input).unwrap();
+        let input_values: Vec<&str> = input.split(" ").collect();
+        let command_text = input_values[0].trim();
+        let arg_text = if input_values.len() > 1 {
+            input_values[1].trim()
+        } else {
+            ""
+        };
+        let command = Command::from_str(command_text).unwrap();
 
         match command {
             Command::Echo => {
@@ -56,13 +63,13 @@ fn main() {
                 break;
             }
             Command::Type => {
-                let args: Vec<&str> = input.split("type").collect();
-                let arg = args[1].trim();
-                let command = Command::from_str(arg).unwrap();
+                // let args: Vec<&str> = input.split("type").collect();
+                // let arg = args[1].trim();
+                let command = Command::from_str(arg_text).unwrap();
 
                 match command {
-                    Command::Unknown => println!("{}: not found", arg),
-                    _ => println!("{} is a shell builtin", arg),
+                    Command::Unknown => println!("{}: not found", arg_text),
+                    _ => println!("{} is a shell builtin", arg_text),
                 }
             }
             Command::Unknown => {
