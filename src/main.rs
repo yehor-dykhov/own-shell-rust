@@ -87,7 +87,7 @@ fn main() {
                     Command::Unknown => {
                         let mut arg_exists = false;
                         for p in &paths {
-                            if contains_executable_file_by_path(arg_text, p) {
+                            if contains_executable_file_by_path(arg_text, *p) {
                                 println!("{0} is {1}/{0}", arg_text, p);
                                 arg_exists = true;
                                 break;
