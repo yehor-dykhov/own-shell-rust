@@ -1,3 +1,4 @@
+use std::{env, fs};
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::str::FromStr;
@@ -33,7 +34,24 @@ impl FromStr for Command {
     }
 }
 
+fn contains_executable_file_by_path(name: &str, path: &str) -> bool {
+    let directory = fs::read_dir(path).unwrap();
+
+    for file in directory {
+        let file_path = file.unwrap();
+
+        if file_path.file_name() == name {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 fn main() {
+    let path_val = env::var("PATH").unwrap_or("".to_owned());
+    let paths: Vec<&str> = path_val.split(";").collect();
+
     // Uncomment this block to pass the first stage
     loop {
         print!("$ ");
@@ -63,12 +81,23 @@ fn main() {
                 break;
             }
             Command::Type => {
-                // let args: Vec<&str> = input.split("type").collect();
-                // let arg = args[1].trim();
                 let command = Command::from_str(arg_text).unwrap();
 
                 match command {
-                    Command::Unknown => println!("{}: not found", arg_text),
+                    Command::Unknown => {
+                        let mut arg_exists = false;
+                        for p in &paths {
+                            if contains_executable_file_by_path(arg_text, p) {
+                                println!("{0} is {1}/{0}", arg_text, p);
+                                arg_exists = true;
+                                break;
+                            }
+                        }
+
+                        if !arg_exists {
+                            println!("{}: not found", arg_text);
+                        }
+                    }
                     _ => println!("{} is a shell builtin", arg_text),
                 }
             }
@@ -76,14 +105,5 @@ fn main() {
                 println!("{}: command not found", trimmed_input);
             }
         }
-
-        // if trimmed_input.contains("exit") {
-        //     break;
-        // } else if trimmed_input.contains("echo") {
-        //     let echo_text: Vec<&str> = input.split("echo").collect();
-        //     println!("{}", echo_text[1].trim());
-        // } else {
-        //     println!("{}: command not found", trimmed_input);
-        // }
     }
 }
