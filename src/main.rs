@@ -35,6 +35,8 @@ impl FromStr for Command {
 }
 
 fn contains_executable_file_by_path(name: &str, path: &str) -> bool {
+    println!("PATH: {}", path);
+
     let directory = fs::read_dir(path).unwrap();
 
     for file in directory {
@@ -51,6 +53,8 @@ fn contains_executable_file_by_path(name: &str, path: &str) -> bool {
 fn main() {
     let path_val = env::var("PATH").unwrap_or("".to_owned());
     let paths: Vec<&str> = path_val.split(";").collect();
+
+    println!("PATHS: {:?}", paths);
 
     // Uncomment this block to pass the first stage
     loop {
