@@ -102,10 +102,7 @@ fn main() {
                 let found_path = contains_executable_file_by_path(command_text, &paths);
 
                 if let Some(_) = found_path {
-                    let command_result = ProcessCommand::new(command_text).arg(arg_text).spawn().unwrap().wait();
-                    if let Ok(r) = command_result {
-                        println!("{}", r)
-                    }
+                    let _ = ProcessCommand::new(command_text).arg(arg_text).output();
                 } else {
                     println!("{}: command not found", trimmed_input);
                 }
