@@ -105,7 +105,9 @@ fn main() {
                 println!("{}", env::current_dir().unwrap().display())
             },
             Command::Cd => {
-                env::set_current_dir(arg_text).unwrap();
+                if env::set_current_dir(arg_text).is_err() {
+                    println!("cd: {}: No such file or directory", arg_text)
+                }
             },
             Command::Unknown => {
                 let found_path = contains_executable_file_by_path(command_text, &paths);
