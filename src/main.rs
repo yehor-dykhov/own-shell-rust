@@ -2,6 +2,7 @@ use std::{env, fs};
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::str::FromStr;
+use std::process::{Command as ProcessCommand};
 
 enum Command {
     Exit,
@@ -34,18 +35,20 @@ impl FromStr for Command {
     }
 }
 
-fn contains_executable_file_by_path(name: &str, path: &str) -> bool {
-    let directory = fs::read_dir(path).unwrap();
+fn contains_executable_file_by_path<'a>(name: &'a str, paths: &Vec<&str>) -> Option<String> {
+    for p in paths {
+        let directory = fs::read_dir(p).unwrap();
 
-    for file in directory {
-        let file_path = file.unwrap();
+        for file in directory {
+            let file_path = file.unwrap();
 
-        if file_path.file_name() == name {
-            return true;
+            if file_path.file_name() == name {
+                return Some(file_path.path().to_str().unwrap().to_owned());
+            }
         }
     }
 
-    return false;
+    return None;
 }
 
 fn main() {
@@ -85,24 +88,27 @@ fn main() {
 
                 match command {
                     Command::Unknown => {
-                        let mut arg_exists = false;
-                        for p in &paths {
-                            if contains_executable_file_by_path(arg_text, *p) {
-                                println!("{0} is {1}/{0}", arg_text, p);
-                                arg_exists = true;
-                                break;
-                            }
-                        }
+                        let found_path = contains_executable_file_by_path(arg_text, &paths);
 
-                        if !arg_exists {
-                            println!("{}: not found", arg_text);
+                        match found_path {
+                            Some(p) => println!("{0} is {1}/{0}", arg_text, p),
+                            None => println!("{}: not found", arg_text),
                         }
                     }
                     _ => println!("{} is a shell builtin", arg_text),
                 }
             }
             Command::Unknown => {
-                println!("{}: command not found", trimmed_input);
+                let found_path = contains_executable_file_by_path(command_text, &paths);
+
+                if let Some(_) = found_path {
+                    let command_result = ProcessCommand::new(command_text).arg(arg_text).spawn().unwrap().wait();
+                    if let Ok(r) = command_result {
+                        println!("{}", r)
+                    }
+                } else {
+                    println!("{}: command not found", trimmed_input);
+                }
             }
         }
     }
