@@ -103,12 +103,13 @@ fn main() {
             }
             Command::Pwd => {
                 println!("{}", env::current_dir().unwrap().display())
-            },
+            }
             Command::Cd => {
-                if env::set_current_dir(arg_text).is_err() {
-                    println!("cd: {}: No such file or directory", arg_text)
+                let arg_path = if arg_text == "~" { env::var("HOME").unwrap_or("".to_owned()) } else { arg_text.to_owned() };
+                if env::set_current_dir(&arg_path).is_err() {
+                    println!("cd: {}: No such file or directory", &arg_path)
                 }
-            },
+            }
             Command::Unknown => {
                 let found_path = contains_executable_file_by_path(command_text, &paths);
 
