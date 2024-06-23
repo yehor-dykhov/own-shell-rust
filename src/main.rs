@@ -9,6 +9,7 @@ enum Command {
     Echo,
     Type,
     Pwd,
+    Cd,
     Unknown,
 }
 
@@ -32,6 +33,7 @@ impl FromStr for Command {
             "exit" => Ok(Command::Exit),
             "type" => Ok(Command::Type),
             "pwd" => Ok(Command::Pwd),
+            "cd" => Ok(Command::Cd),
             _ => Ok(Command::Unknown),
         }
     }
@@ -101,6 +103,9 @@ fn main() {
             }
             Command::Pwd => {
                 println!("{}", env::current_dir().unwrap().display())
+            },
+            Command::Cd => {
+                env::set_current_dir(arg_text).unwrap();
             },
             Command::Unknown => {
                 let found_path = contains_executable_file_by_path(command_text, &paths);
