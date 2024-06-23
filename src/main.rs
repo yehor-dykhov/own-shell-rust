@@ -103,6 +103,7 @@ fn main() {
 
                 if let Some(_) = found_path {
                     let _ = ProcessCommand::new(command_text).arg(arg_text).output();
+                    break;
                 } else {
                     println!("{}: command not found", trimmed_input);
                 }
