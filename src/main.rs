@@ -91,7 +91,7 @@ fn main() {
                         let found_path = contains_executable_file_by_path(arg_text, &paths);
 
                         match found_path {
-                            Some(p) => println!("{0} is {1}/{0}", arg_text, p),
+                            Some(p) => println!("{} is {}", arg_text, p),
                             None => println!("{}: not found", arg_text),
                         }
                     }
