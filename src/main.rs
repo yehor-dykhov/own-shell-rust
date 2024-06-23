@@ -8,6 +8,7 @@ enum Command {
     Exit,
     Echo,
     Type,
+    Pwd,
     Unknown,
 }
 
@@ -30,6 +31,7 @@ impl FromStr for Command {
             "echo" => Ok(Command::Echo),
             "exit" => Ok(Command::Exit),
             "type" => Ok(Command::Type),
+            "pwd" => Ok(Command::Pwd),
             _ => Ok(Command::Unknown),
         }
     }
@@ -55,7 +57,6 @@ fn main() {
     let path_val = env::var("PATH").unwrap_or("".to_owned());
     let paths: Vec<&str> = path_val.split(":").collect();
 
-    // Uncomment this block to pass the first stage
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -98,6 +99,9 @@ fn main() {
                     _ => println!("{} is a shell builtin", arg_text),
                 }
             }
+            Command::Pwd => {
+                println!("{}", env::current_dir().unwrap().display())
+            },
             Command::Unknown => {
                 let found_path = contains_executable_file_by_path(command_text, &paths);
 
